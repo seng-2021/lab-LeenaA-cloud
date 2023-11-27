@@ -1,3 +1,4 @@
+#Pasanen Leena
 import codecs
 
 def encode(s):
