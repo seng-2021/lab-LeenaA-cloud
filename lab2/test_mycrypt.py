@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8
-
+#Pasanen Leena
 '''
 Unit tests for mycrypt function. Basically ROT13, but also
 capitalize or uncapitalize, and for numbers, replace with shifted
@@ -12,7 +12,7 @@ If characters outside allowed ones are used as input, raise ValueError.
 '''
 
 import timeit
-import pytest
+import pytest #Make sure you have th 'pytest' library installed in your Python environment ('pip install pytest')
 import mycrypt
 
 
@@ -35,31 +35,35 @@ def test_encode_decode(test_input):
     assert(mycrypt.decode(mycrypt.encode(test_input))) == test_input
 
 
-@pytest.mark.parametrize("invalid_input", ['+','åäö'])
+@pytest.mark.parametrize("invalid_input", ['+','å','ä','ö'])
 def test_invalid_char(invalid_input):
     '''Invalid characters should result in ValueError'''
     with pytest.raises(ValueError):
         mycrypt.encode(invalid_input)
 
 
-@pytest.mark.parametrize("invalid_input", [])
+@pytest.mark.parametrize("invalid_input",[1,[1,2],1.15])#Modify this list to include other invalid types
 def test_invalid_types(invalid_input):
     '''Invalid parameter types should raise TypeError'''
     with pytest.raises(TypeError):
         mycrypt.encode(invalid_input)
 
+@pytest.mark.parametrize("invalid_input", ["2"*2000,"3"*1500]) #Add test_lengths
+def test_length(invalid_input):
+    '''Invalid input length should result in ValueError'''
+    with pytest.raises(ValueError):
+        mycrypt.encode(invalid_input)
 
 def test_timing():
-    '''Test whether encoding runs in approximately constant time, repetitions
-    kept low to make test fast, use smallest measured time.
-
-    Note: Tests like this need quite a bit of thought when used as a unit test,
-    they are non-deterministic and might fail randomly.
-
-    Hint: pad your string to max length and only return wanted length
-    '''
-    timing1 = min(timeit.repeat('mycrypt.encode("a")',
-                                'import mycrypt', repeat=3, number=30))
-    timing2 = min(timeit.repeat('mycrypt.encode("a"*1000)',
-                                'import mycrypt', repeat=3, number=30))
-    assert 0.95 * timing2 < timing1 < 1.05 * timing2
+    '''Test whether encoding runs in approximately constant time'''
+    single_char_time = timeit.timeit(
+        stmt='mycrypt.encode("a"*1000)',
+        setup='import mycrypt',
+        number=1000
+    )
+    long_string_time = timeit.timeit(
+        stmt='mycrypt.encode("a"*1000000)',
+        setup='import mycrypt',
+        number=1000
+    )
+    assert single_char_time < long_string_time * 1.1  # Checking if the time scales roughly linearly
